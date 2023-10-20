@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+            overflow-y: scroll;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+        }
+
+        .product-container {
+            overflow-y: auto;
+        }
+
+        .product-card {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background-color: #ffffff;
+        }
+
+        .product-card img {
+            max-width: 100px;
+            max-height: 100px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #27a0ff;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #1e87d3;
+        }
+
+        .logo {
+            max-width: 100px;
+            margin-top: -20px;
+        }
+
+        .title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .confidential {
+            font-size: 12px;
+            text-align: right;
+            margin-bottom: 20px;
+            color: #555555;
+        }
+
+        .date {
+            font-size: 12px;
+            text-align: right;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #555555;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <img class="logo" src="https://blueshift.com/wp-content/themes/blueshift-2022/dist/images/blueshift-logo_90b009ab.svg"
+            alt="Blueshift Logo">
+        <h1 class="title">Live Content Webpage</h1>
+        <div class="confidential">Confidential</div>
+
+        <div class="input-container">
+            <label for="userName">Enter User Name:</label>
+            <input type="text" id="userName" onkeypress="handleKeyPress(event)">
+            <button onclick="fetchProducts()">Fetch Products</button>
+        </div>
+
+        <div class="product-container" id="productContainer"></div>
+
+        <div class="date" id="date"></div>
+    </div>
+
+    <script>
+        function fetchProducts() {
+            // Get user input
+            const userName = document.getElementById('userName').value;
+
+            // Construct API URL with user input
+            const apiUrl = `https://api.getblueshift.com/live?slot=Live_Content_Test_Slot_Tejas&email=${userName}&x=5dfe3c9aee8b375bcc616079b08156d9`;
+
+            // Fetch data from the API
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // Get the products array from the API response
+                    const products = data.content.products;
+
+                    // Get the product container element
+                    const productContainer = document.getElementById('productContainer');
+
+                    // Clear previous product data
+                    productContainer.innerHTML = '';
+
+                    // Iterate through the products and populate the container
+                    products.forEach(product => {
+                        const productCard = document.createElement('div');
+                        productCard.classList.add('product-card');
+                        productCard.innerHTML = `
+                            <h2>${product.name}</h2>
+                            <img src="${product.image_url}" alt="${product.name}">
+                            <p>SKU: ${product.sku}</p>
+                            <p>Price: ${product.price}</p>
+                            <p>Brand: ${product.brand}</p>
+                            <p>Availability: ${product.availability}</p>
+                            <p>Category: ${product.category}</p>
+                            <p>Author: ${product.author}</p>
+                            <p>Language: ${product.language}</p>
+                            <p>Pages: ${product.pages}</p>
+                            <a href="${product.web_link}" target="_blank">Product Link</a>
+                        `;
+                        productContainer.appendChild(productCard);
+                    });
+
+                    // Update the date
+                    const currentDate = new Date();
+                    const dateElement = document.getElementById('date');
+                    dateElement.textContent = 'Date: ' + currentDate.toLocaleDateString();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                fetchProducts();
+            }
+        }
+    </script>
+
+</body>
+
+</html>
